@@ -1,7 +1,46 @@
+# Entorno virtual
 .venv/
+
+# Python y Jupyter
 __pycache__/
+*.py[cod]
 .ipynb_checkpoints/
+
+# Credenciales
+.env
+.env.*
+!.env.example
+
+# Datasets
 data/raw/
 data/dataset_estructurado/
 data/test_valparaiso/
+data/valparaiso_raw/
+data/valparaiso_ambiguous/
+
+# Modelos y checkpoints
+checkpoints/
 *.pth
+*.pt
+*.joblib
+
+# Archivos temporales y respaldos
+*.zip
+backups/
+colab_export/
+
+# Embeddings
+*.npz
+results/embeddings/
+
+# Figuras pendientes de verificar derechos
+results/figures/
+docs/figuras/
+docs/*.pdf
+
+# Archivos temporales LaTeX
+*.aux
+*.log
+*.out
+*.fls
+*.fdb_latexmk
