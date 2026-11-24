@@ -1,0 +1,9 @@
+{
+    "total_images": 63,
+    "both_correct": 36,
+    "only_resnet_correct": 2,
+    "only_vit_correct": 2,
+    "both_wrong": 23,
+    "disagreement": 4,
+    "oracle_accuracy": 0.6349206349206349
+}

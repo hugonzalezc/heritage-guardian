@@ -1,0 +1,19 @@
+{
+    "experiment": "vit_small_baseline_seed42",
+    "model": "vit_small",
+    "mode": "baseline",
+    "best_epoch": 4,
+    "best_score": 0.8223140495867769,
+    "selection_metric": "accuracy",
+    "best_val_metrics": {
+        "loss": 0.5325296072920492,
+        "accuracy": 0.8223140495867769,
+        "macro_f1": 0.7791361562135202,
+        "f1_mural": 0.6814814814814815,
+        "recall_mural": 0.5897435897435898
+    },
+    "epochs_completed": 5,
+    "training_seconds": 154.44741403700004,
+    "peak_vram_gb": 0.8421564102172852,
+    "checkpoint": "/content/heritage-guardian/checkpoints/baseline/vit_small_baseline_seed42_best.pth"
+}

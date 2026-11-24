@@ -1,0 +1,22 @@
+{
+    "accuracy": 0.7851239669421488,
+    "balanced_accuracy": 0.750703564727955,
+    "macro_f1": 0.7523809523809524,
+    "f1_grafiti": 0.8424242424242424,
+    "f1_mural": 0.6623376623376623,
+    "precision_mural": 0.6710526315789473,
+    "recall_mural": 0.6538461538461539,
+    "auc_roc": 0.8742182614133833,
+    "mcc": 0.5048924658334119,
+    "specificity": 0.8475609756097561,
+    "grafitis_correctos": 139,
+    "grafitis_como_mural": 25,
+    "murales_como_grafiti": 27,
+    "murales_correctos": 51,
+    "experiment": "resnet18_improved_seed42",
+    "model": "resnet18",
+    "mode": "improved",
+    "split": "val",
+    "checkpoint_epoch": 2,
+    "inference_seconds": 10.046814099885523
+}

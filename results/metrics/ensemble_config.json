@@ -1,0 +1,14 @@
+{
+    "resnet_experiment": "resnet18_balanced_seed42",
+    "vit_experiment": "vit_small_improved_seed42",
+    "alpha_resnet": 0.0,
+    "alpha_vit": 1.0,
+    "selection_metric": "macro_f1",
+    "selection_split": "val",
+    "tie_breakers": [
+        "recall_mural",
+        "accuracy",
+        "lower_alpha_resnet"
+    ],
+    "weight_step": 0.05
+}

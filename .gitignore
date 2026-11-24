@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+data/raw/
+data/dataset_estructurado/
+data/test_valparaiso/
+*.pth

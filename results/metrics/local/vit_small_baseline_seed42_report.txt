@@ -1,0 +1,8 @@
+              precision    recall  f1-score   support
+
+     grafiti       0.56      1.00      0.72        33
+       mural       1.00      0.13      0.24        30
+
+    accuracy                           0.59        63
+   macro avg       0.78      0.57      0.48        63
+weighted avg       0.77      0.59      0.49        63

@@ -1,0 +1,19 @@
+{
+    "experiment": "vit_small_improved_seed42",
+    "model": "vit_small",
+    "mode": "improved",
+    "best_epoch": 10,
+    "best_score": 0.8432164634146342,
+    "selection_metric": "macro_f1",
+    "best_val_metrics": {
+        "loss": 0.4773992861597991,
+        "accuracy": 0.859504132231405,
+        "macro_f1": 0.8432164634146342,
+        "f1_mural": 0.7926829268292683,
+        "recall_mural": 0.8333333333333334
+    },
+    "epochs_completed": 15,
+    "training_seconds": 568.3677674099999,
+    "peak_vram_gb": 0.8405466079711914,
+    "checkpoint": "/content/heritage-guardian/checkpoints/final/vit_small_improved_seed42_best.pth"
+}

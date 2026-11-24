@@ -1,0 +1,19 @@
+{
+    "experiment": "resnet18_baseline_seed42",
+    "model": "resnet18",
+    "mode": "baseline",
+    "best_epoch": 5,
+    "best_score": 0.731404958677686,
+    "selection_metric": "accuracy",
+    "best_val_metrics": {
+        "loss": 0.7806515910408713,
+        "accuracy": 0.731404958677686,
+        "macro_f1": 0.6418732782369145,
+        "f1_mural": 0.4628099173553719,
+        "recall_mural": 0.358974358974359
+    },
+    "epochs_completed": 5,
+    "training_seconds": 353.6757555999793,
+    "peak_vram_gb": 0.8758139610290527,
+    "checkpoint": "C:\\Users\\hugon\\OneDrive\\Escritorio\\heritage-guardian\\checkpoints\\baseline\\resnet18_baseline_seed42_best.pth"
+}

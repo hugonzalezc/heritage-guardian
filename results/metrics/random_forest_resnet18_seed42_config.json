@@ -1,0 +1,23 @@
+{
+    "experiment": "random_forest_resnet18_seed42",
+    "feature_extractor": "resnet18",
+    "pretrained": true,
+    "fine_tuning": false,
+    "embedding_dimension": 512,
+    "class_to_idx": {
+        "grafiti": 0,
+        "mural": 1
+    },
+    "random_forest": {
+        "n_estimators": 300,
+        "max_depth": null,
+        "min_samples_split": 2,
+        "min_samples_leaf": 1,
+        "max_features": "sqrt",
+        "class_weight": "balanced",
+        "random_state": 42,
+        "n_jobs": -1
+    },
+    "train_feature_extraction_seconds": 39.703217699890956,
+    "rf_training_seconds": 1.0758401001803577
+}

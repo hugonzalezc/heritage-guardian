@@ -1,0 +1,27 @@
+{
+    "model": "resnet18",
+    "mode": "balanced",
+    "epochs": 25,
+    "batch_size": 32,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "label_smoothing": 0.05,
+    "optimizer": "AdamW",
+    "scheduler": true,
+    "early_stopping": true,
+    "selection_metric": "macro_f1",
+    "patience": 5,
+    "workers": 2,
+    "seed": 42,
+    "amp": false,
+    "classes": [
+        "grafiti",
+        "mural"
+    ],
+    "class_to_idx": {
+        "grafiti": 0,
+        "mural": 1
+    },
+    "device": "cuda",
+    "torch_version": "2.7.1+cu126"
+}

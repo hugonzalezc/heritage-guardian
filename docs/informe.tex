@@ -1,0 +1,102 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage[a4paper,margin=2.1cm]{geometry}
+\usepackage{lmodern,booktabs,graphicx,amsmath,array,xcolor,hyperref}
+\usepackage{microtype}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt}
+\newcommand{\figura}[2]{\IfFileExists{#1}{\includegraphics[width=#2\linewidth]{#1}}{\fbox{\parbox{.85\linewidth}{\centering Figura pendiente: \texttt{\detokenize{#1}}}}}}
+\title{\vspace{-1.2cm}\textbf{Heritage Guardian: clasificación visual de murales y grafitis}\\\large Evaluación de redes residuales y Vision Transformers en Valparaíso}
+% Confirmar la nómina final: la presentación de avance incluye tres integrantes; el README antiguo solo dos.
+\author{Hugo González \and Rodrigo Venegas \and Víctor Córdova}
+\date{Aprendizaje Automático II -- PUCV\\26 de noviembre de 2026}
+\begin{document}
+\maketitle
+\begin{abstract}
+Se estudia la clasificación binaria de intervenciones urbanas mediante ResNet18, ViT-Small y Random Forest sobre embeddings congelados. Se emplearon 1611 imágenes en particiones fijas de entrenamiento, validación y test, y una evaluación externa de 63 fotografías de Valparaíso más cinco casos ambiguos. ViT-Small Improved alcanzó Macro F1 de 0,8177 y recall mural de 0,8205 en test original, pero obtuvo 0,5055 y 0,1667 respectivamente en el conjunto local. El ensemble ponderado no superó al modelo individual. Random Forest logró el mayor AUC-ROC local (0,8141), aunque también presentó escaso recall mural. La interpretabilidad y una demo Gradio permiten examinar las predicciones y sus límites. Los resultados muestran que el rendimiento interno no garantiza generalización geográfica ni permite inferir autorización o valor patrimonial.
+\end{abstract}
+\section{Motivación y objetivos}
+El proyecto surge del interés por apoyar el análisis de intervenciones urbanas en Valparaíso, donde conviven expresiones pictóricas, letras estilizadas y rayados. La pregunta inicial es si una representación convolucional o una basada en atención permite distinguir mejor estas expresiones. La clasificación se operacionaliza mediante dos categorías visuales, no mediante información jurídica o patrimonial: una fotografía no acredita la autorización de una obra ni su condición de patrimonio protegido.
+
+El objetivo general es comparar arquitecturas de aprendizaje supervisado y evaluar su transferencia al dominio local. Los objetivos específicos son comparar configuraciones de entrenamiento, examinar el efecto del muestreo balanceado, evaluar la complementariedad mediante un ensemble, contrastar con un clasificador clásico, visualizar patrones de relevancia y construir un prototipo reproducible. La hipótesis de que las convoluciones captan rasgos locales y la atención facilita relaciones espaciales se considera una motivación experimental, no una propiedad demostrada por los mapas de calor.
+\section{Datos y protocolo experimental}
+El avance del proyecto declara conjuntos derivados de Graffiti Classification, Roboflow Universe y WikiArt. Los archivos de trabajo se reconstruyeron mediante un proceso de validación de imágenes, asignación de etiquetas por carpeta, reclasificación del prefijo \texttt{vandalico\_} y deduplicación SHA-256. La procedencia individual y las licencias primarias no están completamente verificadas. La reconstrucción contiene 26 imágenes menos que las 1637 del avance; por ello, la comparación histórica es orientativa.
+\begin{center}
+\begin{tabular}{lrrr}\toprule Partición & Grafiti & Mural & Total\\\midrule Train &765&362&1127\\ Validación&164&78&242\\ Test&164&78&242\\\midrule Total&1093&518&1611\\\bottomrule\end{tabular}
+\end{center}
+\newpage
+Las particiones se construyeron aproximadamente en proporción 70/15/15 por clase con semilla 42; no se detectaron duplicados exactos entre ellas. La clase grafiti representa 67,85\% del conjunto. El análisis exploratorio evidenció collages, marcas de agua, variación de resolución y posibles etiquetas ambiguas, factores que pueden facilitar atajos visuales. No se garantiza independencia por obra o fotógrafo ni ausencia de casi duplicados.
+
+El conjunto externo contiene 33 grafitis y 30 murales, además de cinco imágenes dudosas excluidas de las métricas binarias. Se recopilaron 66 imágenes de Flickr, una de Instagram y una de Tur.com. Las etiquetas se fijaron antes de la inferencia: predominio de firmas, tags o letras estilizadas para grafiti; predominio pictórico, figurativo o abstracto para mural; dudoso si no existe predominio claro. Se conservaron los originales y se registraron URL, nombre, etiqueta y hash. Las 68 imágenes fueron válidas y no hubo coincidencias exactas con el conjunto original. Se utilizó una muestra de conveniencia: 30/33 grafitis proceden de una cuenta y 25/30 murales de otra. No se midió acuerdo entre anotadores. La documentación de derechos de uso sigue pendiente.
+\section{Metodología}
+\subsection{Arquitecturas y transferencia}
+ResNet18 utiliza bloques residuales que aprenden una transformación $F(x)$ y agregan una conexión de identidad, $y=F(x)+x$, cuando las dimensiones son compatibles \cite{he}. Se reemplazó su cabeza por una capa lineal de 512 a 2 clases. ViT-Small procesa una imagen de 224 por 224 mediante 196 parches de 16 por 16 y un token de clasificación, con atención escalada \cite{dosovitskiy}: 
+\[\operatorname{Attention}(Q,K,V)=\operatorname{softmax}(QK^T/\sqrt{d_k})V.\]
+Ambas redes se inicializaron con pesos preentrenados y se ajustaron completamente (11,18 y 21,67 millones de parámetros, respectivamente). Como referencia clásica, se congeló una ResNet18 ImageNet, se extrajeron embeddings de 512 dimensiones y se entrenó Random Forest con 300 árboles, pesos de clase balanceados y semilla 42 \cite{breiman}.
+\subsection{Configuraciones de entrenamiento}
+Todas las imágenes se convierten a RGB, se redimensionan a 224 por 224 y se normalizan con estadísticas ImageNet. Baseline aplica flip horizontal en train. Improved incorpora recorte aleatorio redimensionado, flip, rotación y jitter cromático. Balanced conserva esa configuración y agrega muestreo ponderado inversamente a la frecuencia de clase, con reemplazo, solo en train. Validación y test mantienen transformaciones deterministas.
+\begin{center}\small
+\begin{tabular}{lll}\toprule Parámetro & Baseline & Improved / Balanced\\\midrule Épocas máximas &5&25\\ Optimizador &Adam&AdamW\\ LR ResNet / ViT &$10^{-3}/10^{-4}$&$10^{-4}/3\cdot10^{-5}$\\ Weight decay RN / ViT &0 / 0&$10^{-4}/10^{-2}$\\ Label smoothing RN / ViT &0 / 0&0,05 / 0,10\\ Scheduler &No&Cosine annealing\\ Early stopping &No&Paciencia 5\\ Selección checkpoint &Accuracy val&Macro F1 val\\\bottomrule\end{tabular}
+\end{center}
+Se usaron lotes de 32 para ResNet y 16 para ViT. ResNet se entrenó en GTX 1660 Ti Max-Q en FP32; ViT en Tesla T4 (Colab) con AMP. Las diferencias de hardware impiden una comparación controlada de tiempos. Una única semilla limita el análisis de variabilidad.
+\newpage
+\subsection{Evaluación y combinación de modelos}
+Se reportan accuracy, Macro F1 (promedio de F1 por clase), recall mural, AUC-ROC para mural y MCC. El recall mural es prioritario para identificar la omisión de obras pictóricas, mientras Macro F1 reduce el predominio de la clase mayoritaria. El mejor modelo de cada arquitectura se seleccionó por Macro F1 en validación. Se probaron 21 pesos de soft voting:
+\[p_{ens}=\alpha p_{ResNet}+(1-\alpha)p_{ViT},\qquad \alpha\in\{0,0.05,\ldots,1\}.\]
+Se maximizó Macro F1 de validación, con desempate por recall mural, accuracy y menor peso ResNet. Test y local conservaron la configuración fijada. El oracle accuracy cuantifica la fracción de imágenes en que al menos un modelo acierta; no representa un clasificador realizable sin conocer las etiquetas.
+\section{Resultados internos}
+\begin{center}\small
+\begin{tabular}{lrrrrrr}\toprule Modelo & F1 val & Acc. test & F1 test & Recall M & AUC & MCC\\\midrule RN baseline&.6419&.7355&.6454&.3590&.7539&.3376\\ RN improved&.7524&.7810&.7502&.6667&.8547&.5004\\ RN balanced&.7893&.8264&.8027&.7436&.8949&.6055\\ ViT baseline&.7791&.8182&.7789&.6154&\textbf{.8986}&.5675\\ ViT improved&\textbf{.8432}&\textbf{.8347}&\textbf{.8177}&\textbf{.8205}&.8945&\textbf{.6401}\\ ViT balanced&.8215&.8306&.8104&.7821&.8975&.6224\\ Random Forest&.6842&.7273&.6879&.5769&.8011&.3757\\\bottomrule\end{tabular}
+\end{center}
+ViT Improved fue seleccionado en validación y obtuvo el mayor Macro F1 en test. Frente a ViT Baseline, aumentó el recall mural en 20,51 puntos porcentuales y redujo los murales confundidos con grafiti de 30 a 14. ResNet Balanced mejoró el Macro F1 de su baseline en 15,73 puntos. El muestreo ponderado benefició a ResNet respecto de improved, pero no a ViT; no se atribuye significancia estadística a estas diferencias. Random Forest superó el Macro F1 de ResNet Baseline sin ajustar el extractor, aunque quedó por debajo de las configuraciones mejoradas.
+
+Se observó sobreajuste durante el entrenamiento: ViT Improved alcanzó accuracy de train de 0,9973 en su mejor época (10), frente a 0,8595 en validación. Early stopping conservó el checkpoint seleccionado, no eliminó el fenómeno. ResNet Balanced obtuvo su mejor época en la 7 y ViT Balanced en la 9.
+\subsection{Ensemble y complementariedad}
+La búsqueda seleccionó $\alpha=0$: ViT Improved individual. El peso 0,05 empató en Macro F1 y recall, pero no mejoró el criterio de selección. En test, 181 imágenes fueron acertadas por ambos modelos, 19 solo por ResNet, 21 solo por ViT y 21 por ninguno. El oracle accuracy fue 91,32\%, frente a 83,47\% de ViT, indicando complementariedad que el promedio ponderado no aprovechó. En validación el oracle fue 92,56\%. Se conserva ViT como modelo principal, sin presentar el ensemble como un modelo superior.
+\section{Evaluación externa: Valparaíso}
+Los siete experimentos muestran caídas en Macro F1 en la muestra externa. ViT Improved reconoce los 33 grafitis pero solo cinco de los 30 murales: predice grafiti en 58/63 imágenes. El accuracy disminuye de 83,47\% a 60,32\%, y el Macro F1 cae 31,22 puntos porcentuales. El baseline trivial que siempre predice grafiti obtiene 33/63 aciertos (52,38\%); la mejora absoluta de accuracy de ViT respecto de esa referencia local es modesta.
+\newpage
+\begin{center}\small
+\begin{tabular}{lrrrrr}\toprule Modelo & Acc. & Macro F1 & Recall M & AUC & MCC\\\midrule RN baseline&.6032&.5217&.2000&.5747&.2697\\ RN improved&.5873&.4763&.1333&.6374&.2731\\ RN balanced&.6032&.5055&.1667&.7212&.3079\\ ViT baseline&.5873&.4763&.1333&.6212&.2731\\ ViT improved&.6032&.5055&.1667&.6606&.3079\\ ViT balanced&.5714&.4457&.1000&.5424&.2345\\ Random Forest&.6032&.5055&.1667&\textbf{.8141}&.3079\\\bottomrule\end{tabular}
+\end{center}
+\begin{figure}[h!]
+\centering\figura{figuras/generalizacion.pdf}{.94}
+\caption{Macro F1 en test original y evaluación externa. RN: ResNet18; RF: Random Forest. Elaboración propia con las métricas registradas.}
+\end{figure}
+Random Forest presenta el mayor AUC local, pese a reconocer solo cinco murales con la decisión habitual. Esto distingue capacidad de ordenamiento de puntuaciones y calidad de las decisiones a umbral fijo. No se ajustó el umbral con el test externo. En local, ResNet Balanced y ViT Improved aciertan conjuntamente 36 imágenes, cada uno acierta dos adicionales y ambos fallan 23. El oracle cae a 63,49\%, lo que limita el potencial de seleccionar entre ambas predicciones fijas.
+
+En las cinco imágenes ambiguas, los tres modelos predijeron grafiti. Las puntuaciones de ResNet oscilan entre 87,33\% y 99,85\%; las de ViT entre 87,16\% y 96,82\%; las de Random Forest entre 58\% y 81\%. No se reporta accuracy porque no existe referencia binaria. La coincidencia no es un indicador suficiente de ausencia de ambigüedad.
+
+La caída es compatible con cambio de dominio, desbalance, diferencias de criterios de etiqueta y correlaciones espurias asociadas a fuentes. No se ha aislado causalmente ninguno de estos factores; el distinto balance y tamaño de los conjuntos también afecta la comparación. Una futura evaluación debe separar por obra y fuente, incorporar anotadores independientes y reservar un nuevo conjunto externo.
+\section{Interpretabilidad}
+Se aplicó Grad-CAM \cite{selvaraju} a la última etapa convolucional de ResNet Balanced, usando los gradientes de la clase predicha; para ViT Improved se promediaron cabezas y se multiplicaron matrices de atención normalizadas con residual (Attention Rollout \cite{abnar}). Se seleccionaron 16 casos de validación y 10 locales, por clase y patrón de acierto, con semilla fija. Los mapas se normalizan individualmente, no son directamente comparables en magnitud y Attention Rollout no es específico de la clase.
+\newpage
+\begin{figure}[h!]
+\centering\figura{figuras/rostro.png}{1}
+\caption{Caso local 039: ResNet predice grafiti (74,8\%) y destaca el patrón lateral; ViT predice mural (70,2\%) y destaca regiones del rostro.}
+\end{figure}
+\begin{figure}[h!]
+\centering\figura{figuras/error_compartido.png}{1}
+\caption{Caso local 047: mural figurativo clasificado como grafiti por ResNet (98,8\%) y ViT (88,1\%). Grad-CAM destaca la obra; Rollout incluye un máximo sobre el pavimento.}
+\end{figure}
+Los ejemplos evidencian que los mapas pueden destacar regiones externas o la propia intervención aun cuando la predicción sea incorrecta. En el caso local 058 (animal y planeta), ResNet acierta con 55,9\% y ViT predice grafiti con 81,6\%, pese a destacar partes del animal. En el caso 053 (mural conmemorativo de un gato), ambos fallan; Grad-CAM enfatiza la inscripción inferior. En contraste, el caso 059 (ave sobre un soporte urbano) es reconocido por ambas redes aun con grafiti visible en el fondo. La presencia de texto, la densidad de contornos y las texturas del entorno son hipótesis de análisis, no causas verificadas. Son observaciones cualitativas, no demostraciones de causalidad ni prueba de que una arquitectura siempre use información local o global. Los errores con puntuaciones altas motivan estudiar calibración antes de un uso real.
+\newpage
+\section{Prototipo, conclusiones y trabajo futuro}
+La aplicación Gradio permite cargar una fotografía, comparar ViT Improved, ResNet Balanced y Random Forest, visualizar puntuaciones y activar mapas de interpretabilidad. Incluye resultados experimentales y advertencias sobre desacuerdo, margen de decisión y uso responsable. Se comprobó ejecución local con CUDA; la demo es académica, no un instrumento para decidir sanciones, retirar obras o identificar patrimonio.
+\begin{figure}[h!]
+\centering\figura{figuras/demo.png}{.88}
+\caption{Demo local: los tres modelos clasifican como grafiti una composición figurativa; ViT asigna 94,43\%. La captura ilustra las limitaciones observadas, no una nueva métrica de evaluación.}
+\end{figure}
+
+El trabajo muestra mejoras internas mediante fine-tuning y regularización, efectos distintos del balanceo y ausencia de ganancia con el ensemble probado. La brecha externa es el hallazgo central: un buen resultado en test original no garantiza utilidad en Valparaíso. Se propone curar las fuentes, verificar licencias, mejorar la consistencia de etiquetas, recolectar datos locales representativos y estudiar adaptación de dominio y calibración en una partición local de desarrollo distinta de un nuevo test independiente. No se recomienda cambiar los modelos utilizando las 63 imágenes ya evaluadas.
+\begin{thebibliography}{9}\small
+\bibitem{he} K. He et al. Deep Residual Learning for Image Recognition. CVPR, 2016.
+\bibitem{dosovitskiy} A. Dosovitskiy et al. An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale. ICLR, 2021.
+\bibitem{breiman} L. Breiman. Random Forests. Machine Learning 45, 5--32, 2001.
+\bibitem{selvaraju} R. R. Selvaraju et al. Grad-CAM: Visual Explanations from Deep Networks via Gradient-based Localization. ICCV, 2017.
+\bibitem{abnar} S. Abnar y W. Zuidema. Quantifying Attention Flow in Transformers. ACL, 2020.
+\end{thebibliography}
+\end{document}

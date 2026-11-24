@@ -1,0 +1,22 @@
+{
+    "accuracy": 0.8223140495867769,
+    "balanced_accuracy": 0.7613352095059412,
+    "macro_f1": 0.7791361562135202,
+    "f1_grafiti": 0.8767908309455588,
+    "f1_mural": 0.6814814814814815,
+    "precision_mural": 0.8070175438596491,
+    "recall_mural": 0.5897435897435898,
+    "auc_roc": 0.9017354596622889,
+    "mcc": 0.5756703410264838,
+    "specificity": 0.9329268292682927,
+    "grafitis_correctos": 153,
+    "grafitis_como_mural": 11,
+    "murales_como_grafiti": 32,
+    "murales_correctos": 46,
+    "experiment": "vit_small_baseline_seed42",
+    "model": "vit_small",
+    "mode": "baseline",
+    "split": "val",
+    "checkpoint_epoch": 4,
+    "inference_seconds": 16.154822999844328
+}

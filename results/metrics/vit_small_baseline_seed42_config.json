@@ -1,0 +1,27 @@
+{
+    "model": "vit_small",
+    "mode": "baseline",
+    "epochs": 5,
+    "batch_size": 16,
+    "lr": 0.0001,
+    "weight_decay": 0.0,
+    "label_smoothing": 0.0,
+    "optimizer": "Adam",
+    "scheduler": false,
+    "early_stopping": false,
+    "selection_metric": "accuracy",
+    "patience": 5,
+    "workers": 2,
+    "seed": 42,
+    "amp": true,
+    "classes": [
+        "grafiti",
+        "mural"
+    ],
+    "class_to_idx": {
+        "grafiti": 0,
+        "mural": 1
+    },
+    "device": "cuda",
+    "torch_version": "2.14.1+cu130"
+}
