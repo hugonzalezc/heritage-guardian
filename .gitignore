@@ -44,3 +44,36 @@ docs/*.pdf
 *.out
 *.fls
 *.fdb_latexmk
+
+# ==========================================
+# HERITAGE GUARDIAN V2
+# ==========================================
+
+# Fotografias originales
+data/valparaiso_v2_raw/
+
+# Fotografias limpias
+data/valparaiso_v2_clean/
+
+# Regiones de interes
+data/valparaiso_v2_crops/
+
+# Anotaciones pendientes de revision
+data/annotations_v2/
+
+# Dataset estructurado
+data/valparaiso_v2/
+
+# Checkpoints V2
+checkpoints/v2/
+
+# Figuras pendientes de verificar derechos
+results/v2/figures/
+
+# Predicciones pendientes de revision
+results/v2/predictions/
+
+# Credenciales de APIs
+.env
+.env.*
+!.env.example
